@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#D9624A"/>
+  <rect x="40" y="40" width="1120" height="720" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="600" y="380" text-anchor="middle" font-family="Arial,sans-serif" font-size="36" fill="white" font-weight="bold">Habitación 2/3 - B</text>
+  <text x="600" y="430" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="rgba(255,255,255,0.6)">Colocar foto aquí: img/hab2-b.jpg</text>
+</svg>
