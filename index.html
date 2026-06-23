@@ -1053,7 +1053,7 @@ footer {
 
   <!-- RIGHT — street photo -->
   <div class="hero-right">
-    <img src="img/calle-1.svg" alt="Fachada Casa Juriquilla" id="hero-img"
+    <img src="./img/calle-1.svg" alt="Fachada Casa Juriquilla" id="hero-img"
          onerror="this.style.display='none'; document.getElementById('hero-placeholder').style.display='flex'">
     <div id="hero-placeholder" style="display:none; width:100%; height:100%; background:linear-gradient(135deg,#254E7A,#1B3A5C); align-items:center; justify-content:center; flex-direction:column; gap:12px;">
       <svg style="width:64px;height:64px;stroke:rgba(255,255,255,0.2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1186,13 +1186,13 @@ footer {
           <rect x="12" y="16" width="80"  height="4"  rx="2" fill="#B39DDB" opacity="0.3"/>
         </g>
 
-        <!-- BAÑO COMPARTIDO (center, top of stairs) -->
-        <rect x="330" y="265" width="160" height="95" rx="6" fill="#E8EAF6" stroke="#7986CB" stroke-width="1.5"/>
-        <text x="410" y="306" text-anchor="middle" font-family="Inter,sans-serif" font-size="10.5" fill="#3F51B5" font-weight="700">BAÑO</text>
-        <text x="410" y="322" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7986CB">Compartido H2 y H3</text>
+        <!-- BAÑO COMPARTIDO (right side, smaller) -->
+        <rect x="700" y="355" width="70" height="85" rx="6" fill="#E8EAF6" stroke="#7986CB" stroke-width="1.5"/>
+        <text x="735" y="395" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#3F51B5" font-weight="700">BAÑO</text>
+        <text x="735" y="408" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#7986CB">Comp.</text>
         <!-- Bath/shower icons -->
-        <rect x="342" y="330" width="55" height="20" rx="4" fill="#9FA8DA" opacity="0.5"/>
-        <circle cx="428" cy="342" r="10" fill="none" stroke="#9FA8DA" stroke-width="1.5" opacity="0.7"/>
+        <rect x="708" y="415" width="20" height="15" rx="2" fill="#9FA8DA" opacity="0.5"/>
+        <circle cx="740" cy="423" r="6" fill="none" stroke="#9FA8DA" stroke-width="1" opacity="0.7"/>
 
         <!-- HAB 1 — PRINCIPAL (right, large) -->
         <rect x="500" y="64" width="280" height="390" rx="6" fill="#DCEAF7" stroke="#2A5080" stroke-width="2"/>
@@ -1249,9 +1249,9 @@ footer {
         <rect x="50" y="385" width="130" height="55" rx="4" fill="#A8E6C8" opacity="0.5"/>
         <text x="115" y="415" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#1a6640">CAMA</text>
 
-        <!-- Arrows: hab2 y hab3 to baño compartido -->
-        <line x1="320" y1="160" x2="330" y2="310" stroke="#7986CB" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
-        <line x1="320" y1="360" x2="330" y2="340" stroke="#7986CB" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
+        <!-- Arrows: hab2 y hab3 to baño compartido (new position) -->
+        <line x1="320" y1="160" x2="700" y2="380" stroke="#7986CB" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
+        <line x1="320" y1="360" x2="700" y2="395" stroke="#7986CB" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
 
         <!-- Click targets (transparent) -->
         <rect x="500" y="64" width="280" height="390" rx="6" fill="transparent" style="cursor:pointer" onclick="openModal(1)"/>
@@ -1295,95 +1295,8 @@ footer {
   <div class="section-inner">
     <div class="section-label" style="color:rgba(255,255,255,0.45);">Incluido en tu renta</div>
     <h2 class="section-title">Todo lo que necesitas,<br><span>sin cobros extra</span></h2>
-    <div class="amenities-grid">
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <div class="amenity-name">Luz incluida</div>
-        <div class="amenity-sub">Sin límite de consumo</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
-        </div>
-        <div class="amenity-name">Agua incluida</div>
-        <div class="amenity-sub">Sin cargo adicional</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17 12h.01"/><path d="M3 8a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7a4 4 0 01-4-4z"/><path d="M7 16v2M17 16v2M7 8v.01M12 8v.01M17 8v.01M12 12v.01"/></svg>
-        </div>
-        <div class="amenity-name">Gas incluido</div>
-        <div class="amenity-sub">Regadera caliente siempre</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg>
-        </div>
-        <div class="amenity-name">Internet WiFi</div>
-        <div class="amenity-sub">Alta velocidad incluida</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        </div>
-        <div class="amenity-name">Casa amueblada</div>
-        <div class="amenity-sub">Todas las áreas comunes</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
-        <div class="amenity-name">Sala y comedor</div>
-        <div class="amenity-sub">Áreas comunes compartidas</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg>
-        </div>
-        <div class="amenity-name">Cocina equipada</div>
-        <div class="amenity-sub">Refrigerador y estufa</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        </div>
-        <div class="amenity-name">Dos patios</div>
-        <div class="amenity-sub">Frontal y trasero</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <div class="amenity-name">Lavadora</div>
-        <div class="amenity-sub">Patio trasero · Lavadero</div>
-      </div>
-
-      <div class="amenity-card">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div class="amenity-name">Solo 3 compañeros</div>
-        <div class="amenity-sub">Casa tranquila</div>
-      </div>
-
-      <div class="amenity-card" style="grid-column: span 2;">
-        <div class="amenity-icon-wrap">
-          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        </div>
-        <div class="amenity-name">Limpieza de áreas comunes</div>
-        <div class="amenity-sub">Cooperación de $125 por servicio · Cada inquilino contribuye equitativamente</div>
-      </div>
+    <div class="amenities-grid" id="amenities-grid">
+      <!-- Populated by JS from config.js -->
     </div>
   </div>
 </section>
@@ -1846,10 +1759,84 @@ Por favor avísenme cuando esté disponible. ¡Gracias!`;
 }
 
 // ================================================================
+//  AMENITIES
+// ================================================================
+function buildAmenities() {
+  const grid = document.getElementById('amenities-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  CONFIG.amenities.forEach((a, idx) => {
+    const hasImages = a.imagenes && a.imagenes.length > 0;
+    const onclick = hasImages ? `onclick="openAmenityModal(${idx})"` : '';
+    const style = hasImages ? 'cursor:pointer;' : '';
+    
+    const card = document.createElement('div');
+    card.className = 'amenity-card';
+    if (hasImages) card.style.cursor = 'pointer';
+    if (idx === CONFIG.amenities.length - 1) card.style.gridColumn = 'span 2';
+    
+    card.innerHTML = `
+      <div class="amenity-icon-wrap" style="${style}">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">${a.icon}</svg>
+      </div>
+      <div class="amenity-name">${a.nombre}</div>
+      <div class="amenity-sub">${a.sub}</div>
+      ${hasImages ? '<div style="font-size:0.7rem;color:var(--gold);margin-top:8px;">Haz clic para ver fotos</div>' : ''}
+    `;
+    
+    if (hasImages) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => openAmenityModal(idx));
+    }
+    
+    grid.appendChild(card);
+  });
+}
+
+let activeAmenity = null;
+function openAmenityModal(idx) {
+  const a = CONFIG.amenities[idx];
+  if (!a.imagenes || !a.imagenes.length) return;
+  
+  activeAmenity = idx;
+  const photosEl = document.getElementById('modal-photos');
+  
+  photosEl.style.display = 'block';
+  photosEl.innerHTML = a.imagenes.map((src, i) =>
+    `<img src="${src}" class="${i===0?'active':''}" alt="${a.nombre} foto ${i+1}"
+          onerror="this.style.display='none'">`
+  ).join('');
+  
+  if (a.imagenes.length > 1) {
+    photosEl.innerHTML += `<div class="modal-photo-nav">
+      ${a.imagenes.map((_, i) => `<button class="mpn-dot${i===0?' active':''}" onclick="switchAmenityPhoto(${i})"></button>`).join('')}
+    </div>`;
+  }
+  
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-room-name">${a.nombre}</div>
+      <div style="font-size:0.9rem;color:var(--slate);margin-top:8px;">${a.sub}</div>
+    </div>`;
+  
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function switchAmenityPhoto(idx) {
+  const photos = document.querySelectorAll('#modal-photos img');
+  const dots = document.querySelectorAll('.mpn-dot');
+  photos.forEach((img, i) => img.classList.toggle('active', i === idx));
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+// ================================================================
 //  INIT
 // ================================================================
 syncFpStatus();
 buildCards();
+buildAmenities();
 </script>
 </body>
 </html>
