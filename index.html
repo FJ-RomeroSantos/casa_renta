@@ -1,73 +1,1925 @@
-# Dieto Metrics v2.0
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Juriquilla — Cuartos en Renta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   TOKENS
+================================================================ */
+:root {
+  --navy:        #1B3A5C;
+  --navy-mid:    #254E7A;
+  --navy-light:  #3A6898;
+  --sand:        #F5EFE6;
+  --sand-mid:    #EDE4D6;
+  --sand-dark:   #D9CEBC;
+  --green:       #2E9E62;
+  --green-pale:  #EAF6F0;
+  --coral:       #D9624A;
+  --coral-pale:  #FCEEE9;
+  --gold:        #C4963A;
+  --gold-pale:   #FBF3E3;
+  --slate:       #8A99AC;
+  --text:        #18202B;
+  --text-soft:   #5A6475;
+  --white:       #FFFFFF;
 
-Calculadora nutricional con base de datos de 2,863 alimentos mexicanos (INCMNSZ).
+  --r-sm:   8px;
+  --r-md:  14px;
+  --r-lg:  20px;
+  --r-xl:  28px;
 
-## Estructura
+  --shadow-sm:  0 2px 8px rgba(27,58,92,0.08);
+  --shadow-md:  0 6px 24px rgba(27,58,92,0.12);
+  --shadow-lg:  0 16px 48px rgba(27,58,92,0.18);
 
-```
-dieto_metrics/
-├── backend/
-│   ├── main.py           ← FastAPI — API REST
-│   ├── requirements.txt
-│   └── alimentos5.db     ← Base de datos SQLite (copiar aquí)
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx
-│   │   ├── api.js
-│   │   └── components/
-│   │       ├── Sidebar.jsx
-│   │       ├── FoodTable.jsx
-│   │       ├── NutritionSummary.jsx
-│   │       ├── MacroChart.jsx
-│   │       └── Toast.jsx
-│   └── package.json
-└── start.sh              ← Arrancar todo con un comando
-```
+  --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
 
-## Requisitos
+/* ================================================================
+   RESET & BASE
+================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--sand);
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+button { cursor: pointer; font-family: inherit; }
+a { text-decoration: none; color: inherit; }
 
-- Python 3.9+
-- Node.js 18+
-- pip
+/* ================================================================
+   LUCIDE ICON HELPER
+   (inline SVG via <svg use> pattern — icons defined in <defs>)
+================================================================ */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.icon-lg  { width: 1.5em; height: 1.5em; }
+.icon-xl  { width: 2em;   height: 2em;   }
+.icon-2xl { width: 2.8em; height: 2.8em; }
 
-## Arrancar (opción fácil)
+/* ================================================================
+   NAV
+================================================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: rgba(27,58,92,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  transition: background var(--transition);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 0.83rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  transition: color var(--transition);
+}
+.nav-links a:hover { color: white; }
+.nav-cta {
+  background: var(--gold);
+  color: var(--navy);
+  padding: 9px 22px;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.nav-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(196,150,58,0.4);
+}
 
-```bash
-chmod +x start.sh
-./start.sh
-```
+/* ================================================================
+   HERO — SPLIT LAYOUT
+================================================================ */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  padding-top: 64px; /* nav height */
+}
 
-Luego abre: **http://localhost:5173**
+/* Left panel */
+.hero-left {
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 72px 56px 72px 56px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 80%, rgba(196,150,58,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 90% 10%, rgba(46,158,98,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 24px;
+}
+.hero-eyebrow-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 3.5vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: white;
+  margin-bottom: 10px;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+.hero-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 48px;
+}
 
-## Arrancar manualmente
+/* Proximity cards */
+.hero-prox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 48px;
+}
+.prox-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--r-md);
+  backdrop-filter: blur(4px);
+}
+.prox-icon {
+  width: 38px; height: 38px;
+  border-radius: var(--r-sm);
+  background: rgba(196,150,58,0.18);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.prox-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.2;
+}
+.prox-sub {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.42);
+  margin-top: 2px;
+}
 
-**Backend:**
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
+/* Nav buttons */
+.hero-nav-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.hnb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--r-md);
+  color: rgba(255,255,255,0.8);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  cursor: pointer;
+}
+.hnb:hover {
+  background: rgba(255,255,255,0.11);
+  border-color: rgba(255,255,255,0.25);
+  color: white;
+}
+.hnb.accent {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+  grid-column: 1 / -1;
+}
+.hnb.accent:hover {
+  background: #d4a440;
+  box-shadow: 0 6px 20px rgba(196,150,58,0.35);
+}
+.hnb-icon {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hnb.accent .hnb-icon { background: rgba(27,58,92,0.18); }
 
-**Frontend (en otra terminal):**
-```bash
-cd frontend
-npm install
-npm run dev
-```
+/* Right panel — foto calle */
+.hero-right {
+  position: relative;
+  overflow: hidden;
+}
+.hero-right img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-right-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(27,58,92,0.35) 0%, transparent 60%);
+}
+.hero-right-tag {
+  position: absolute;
+  bottom: 32px;
+  right: 24px;
+  background: rgba(27,58,92,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--r-md);
+  padding: 14px 20px;
+  color: white;
+}
+.hrt-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.hrt-addr  { font-size: 0.9rem; font-weight: 600; }
 
-## API endpoints
+/* ================================================================
+   SECTION BASE
+================================================================ */
+.section { padding: 88px 56px; }
+.section-inner { max-width: 1080px; margin: 0 auto; }
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+  margin-bottom: 48px;
+  line-height: 1.15;
+}
+.section-title span { color: var(--gold); font-style: italic; }
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/grupos` | Lista de grupos de alimentos |
-| GET | `/alimentos?grupo=X` | Alimentos por grupo |
-| GET | `/alimento/{nombre}` | Detalle de un alimento |
-| POST | `/calcular` | Calcular macros de una lista |
-| GET | `/docs` | Documentación interactiva (Swagger) |
+/* ================================================================
+   FLOOR PLAN  — TABBED
+================================================================ */
+.floorplan-section { background: white; }
 
-## Fase siguiente
+.floor-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--sand);
+  border-radius: 100px;
+  padding: 4px;
+  width: fit-content;
+  margin: 0 auto 40px;
+}
+.floor-tab {
+  padding: 10px 28px;
+  border-radius: 100px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-soft);
+  transition: all var(--transition);
+  letter-spacing: 0.02em;
+}
+.floor-tab.active {
+  background: var(--navy);
+  color: white;
+  box-shadow: 0 2px 12px rgba(27,58,92,0.25);
+}
 
-- [ ] Autenticación JWT (usuario / admin)
-- [ ] Sistema de licencias por device hash
-- [ ] Panel de administración
-- [ ] Empaquetado con Electron (desktop)
+.floor-canvas { display: none; }
+.floor-canvas.active { display: block; }
+
+.fp-svg {
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--sand-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.fp-hint {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--slate);
+  margin-top: 14px;
+  letter-spacing: 0.03em;
+}
+
+/* ================================================================
+   ROOM CARDS
+================================================================ */
+.rooms-section { background: var(--sand); }
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.room-card {
+  background: white;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid transparent;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  cursor: pointer;
+}
+.room-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--navy);
+}
+
+/* Image gallery mini */
+.room-gallery {
+  position: relative;
+  height: 210px;
+  overflow: hidden;
+  background: var(--sand-mid);
+}
+.room-gallery img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.room-card:hover .room-gallery img { transform: scale(1.04); }
+
+.gallery-dots {
+  position: absolute;
+  bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+.gdot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.gdot.active { background: white; }
+
+.room-body { padding: 22px 22px 20px; }
+
+.room-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.room-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.2;
+}
+.room-price {
+  text-align: right;
+  flex-shrink: 0;
+}
+.room-price strong {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.02em;
+}
+.room-price small {
+  font-size: 0.72rem;
+  color: var(--slate);
+  font-weight: 400;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  letter-spacing: 0.03em;
+}
+.status-badge.available { background: var(--green-pale); color: var(--green); }
+.status-badge.occupied  { background: var(--coral-pale); color: var(--coral); }
+.status-badge.soon      { background: var(--gold-pale);  color: var(--gold);  }
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.room-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 18px;
+}
+.room-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+.feat-icon {
+  flex-shrink: 0;
+  color: var(--navy);
+  opacity: 0.6;
+}
+
+.card-btn {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: var(--r-sm);
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.card-btn.primary { background: var(--navy); color: white; }
+.card-btn.primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
+.card-btn.waitlist { background: var(--coral-pale); color: var(--coral); }
+.card-btn.waitlist:hover { background: #f7d8d1; }
+
+/* ================================================================
+   AMENITIES
+================================================================ */
+.amenities-section { background: var(--navy); }
+.amenities-section .section-title { color: white; }
+
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+.amenity-card {
+  padding: 22px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--r-md);
+  transition: background var(--transition);
+  text-align: center;
+}
+.amenity-card:hover { background: rgba(255,255,255,0.09); }
+.amenity-icon-wrap {
+  width: 48px; height: 48px;
+  border-radius: var(--r-sm);
+  background: rgba(196,150,58,0.18);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold);
+  margin: 0 auto 12px;
+}
+.amenity-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.amenity-sub {
+  font-size: 0.71rem;
+  color: rgba(255,255,255,0.38);
+  line-height: 1.4;
+}
+
+/* ================================================================
+   MAP
+================================================================ */
+.map-section { background: white; }
+
+.map-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+.map-embed {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  height: 440px;
+}
+.map-embed iframe { width: 100%; height: 100%; border: none; display: block; }
+
+.map-sidebar { display: flex; flex-direction: column; gap: 12px; }
+
+.nearby-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--sand);
+  border-radius: var(--r-md);
+  border: 1px solid var(--sand-dark);
+  transition: border-color var(--transition);
+}
+.nearby-card:hover { border-color: var(--navy); }
+.nearby-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--r-sm);
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+.nearby-name { font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.nearby-dist { font-size: 0.75rem; color: var(--slate); margin-top: 2px; }
+
+.map-address-tag {
+  margin-top: 8px;
+  padding: 18px;
+  background: var(--navy);
+  border-radius: var(--r-md);
+  color: white;
+}
+.mat-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+.mat-addr  { font-size: 0.88rem; font-weight: 500; line-height: 1.5; }
+.mat-link  {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: var(--gold);
+  color: var(--navy);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: transform var(--transition);
+}
+.mat-link:hover { transform: translateY(-2px); }
+
+/* ================================================================
+   MODAL
+================================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18,24,38,0.72);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: var(--r-xl);
+  max-width: 580px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.92) translateY(18px); opacity: 0; }
+  to   { transform: scale(1) translateY(0);        opacity: 1; }
+}
+
+/* Photo strip */
+.modal-photos {
+  position: relative;
+  height: 230px;
+  overflow: hidden;
+  background: var(--sand-mid);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+.modal-photos img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.modal-photos img.active { opacity: 1; }
+
+.modal-photo-nav {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+.mpn-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: background var(--transition);
+  border: none;
+}
+.mpn-dot.active { background: white; }
+
+.modal-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  z-index: 10;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text);
+  transition: background var(--transition);
+}
+.modal-close:hover { background: white; }
+
+.modal-body { padding: 28px 32px 32px; }
+
+.modal-header { margin-bottom: 16px; }
+.modal-room-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.modal-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.modal-price-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.03em;
+}
+.modal-price-per { font-size: 0.9rem; color: var(--slate); }
+
+.modal-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--sand-mid);
+}
+.modal-features li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.875rem;
+  color: var(--text-soft);
+}
+
+/* Rules */
+.rules-block {
+  background: var(--gold-pale);
+  border: 1px solid rgba(196,150,58,0.35);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+.rules-block h4 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #7a5c10;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.rules-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.rules-list li {
+  font-size: 0.8rem;
+  color: #6b5014;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+}
+.rules-list li::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 6px;
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 11px 15px;
+  border: 1.5px solid var(--sand-dark);
+  border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text);
+  background: white;
+  transition: border-color var(--transition);
+  outline: none;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--navy); }
+
+.time-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.time-chip {
+  padding: 10px 12px;
+  border: 1.5px solid var(--sand-dark);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-soft);
+  line-height: 1.3;
+  transition: all var(--transition);
+  user-select: none;
+}
+.time-chip:hover { border-color: var(--navy); color: var(--navy); }
+.time-chip.sel {
+  border-color: var(--navy);
+  background: #EEF3F9;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.modal-submit {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--r-md);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transition: all var(--transition);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+}
+.modal-submit.wa { background: #25D366; color: white; }
+.modal-submit.wa:hover { background: #1eb859; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.35); }
+
+/* Success */
+.success-card {
+  background: var(--green-pale);
+  border: 1px solid rgba(46,158,98,0.3);
+  border-radius: var(--r-md);
+  padding: 24px;
+  text-align: center;
+  display: none;
+}
+.success-card.show { display: block; }
+.success-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.success-card p { font-size: 0.87rem; color: #2a7a4c; line-height: 1.6; }
+
+/* ================================================================
+   FOOTER
+================================================================ */
+footer {
+  background: var(--navy);
+  padding: 40px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.footer-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+.footer-brand span { color: var(--gold); }
+.footer-meta {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+}
+.footer-wa {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 22px;
+  background: #25D366;
+  color: white;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.footer-wa:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,211,102,0.35); }
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media (max-width: 1024px) {
+  .amenities-grid { grid-template-columns: repeat(3, 1fr); }
+  .rooms-grid { grid-template-columns: 1fr 1fr; }
+  .map-layout { grid-template-columns: 1fr; }
+  .map-embed { height: 340px; }
+}
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { height: 300px; }
+  .section { padding: 60px 24px; }
+  .nav { padding: 0 24px; }
+  .hero-left { padding: 48px 28px; }
+  .rooms-grid { grid-template-columns: 1fr; }
+  .amenities-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-links { display: none; }
+  .modal-body { padding: 22px 20px 26px; }
+  .time-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; text-align: center; padding: 36px 24px; }
+  .hero-nav-btns { grid-template-columns: 1fr; }
+  .hnb.accent { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav class="nav">
+  <div class="nav-logo">Casa<span>Juriquilla</span></div>
+  <ul class="nav-links">
+    <li><a href="#plano">Plano</a></li>
+    <li><a href="#cuartos">Cuartos</a></li>
+    <li><a href="#amenidades">Incluye</a></li>
+    <li><a href="#ubicacion">Ubicación</a></li>
+  </ul>
+  <a href="#cuartos" class="nav-cta">Ver disponibilidad</a>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section class="hero" id="inicio">
+
+  <!-- LEFT -->
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      San Bernardo 208 · Juriquilla, Querétaro
+    </div>
+
+    <h1 class="hero-title">Cuartos en renta<br>a 5 minutos de<br><em>la UAQ y la UVM</em></h1>
+
+    <div class="hero-location">
+      <!-- icon: map-pin -->
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      Juriquilla San Francisco, C.P. 76230
+    </div>
+
+    <!-- Proximity pills -->
+    <div class="hero-prox">
+      <div class="prox-card">
+        <div class="prox-icon">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <div>
+          <div class="prox-label">UAQ Campus Juriquilla</div>
+          <div class="prox-sub">5 min caminando</div>
+        </div>
+      </div>
+      <div class="prox-card">
+        <div class="prox-icon">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <div>
+          <div class="prox-label">UVM Querétaro</div>
+          <div class="prox-sub">5 min caminando</div>
+        </div>
+      </div>
+      <div class="prox-card">
+        <div class="prox-icon">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div>
+          <div class="prox-label">Todos los servicios incluidos</div>
+          <div class="prox-sub">Agua · Gas · Luz · Internet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="hero-nav-btns">
+      <button class="hnb accent" onclick="scrollTo('#cuartos')">
+        <div class="hnb-icon">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        Ver cuartos y disponibilidad
+      </button>
+      <button class="hnb" onclick="scrollTo('#plano')">
+        <div class="hnb-icon">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        Plano de la casa
+      </button>
+      <button class="hnb" onclick="scrollTo('#ubicacion')">
+        <div class="hnb-icon">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        Mapa y ubicación
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT — street photo -->
+  <div class="hero-right">
+    <img src="img/calle-1.jpg" alt="Fachada Casa Juriquilla" id="hero-img"
+         onerror="this.style.display='none'; document.getElementById('hero-placeholder').style.display='flex'">
+    <div id="hero-placeholder" style="display:none; width:100%; height:100%; background:linear-gradient(135deg,#254E7A,#1B3A5C); align-items:center; justify-content:center; flex-direction:column; gap:12px;">
+      <svg style="width:64px;height:64px;stroke:rgba(255,255,255,0.2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span style="color:rgba(255,255,255,0.3); font-size:0.8rem;">img/calle-1.jpg</span>
+    </div>
+    <div class="hero-right-overlay"></div>
+    <div class="hero-right-tag">
+      <div class="hrt-label">Dirección</div>
+      <div class="hrt-addr">Calle San Bernardo 208<br>Juriquilla, Querétaro</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PLANO DE LA CASA
+============================================================ -->
+<section class="section floorplan-section" id="plano">
+  <div class="section-inner">
+    <div class="section-label">Distribución</div>
+    <h2 class="section-title">Plano de la <span>casa</span></h2>
+
+    <div class="floor-tabs">
+      <button class="floor-tab active" onclick="switchFloor('pb')">Planta Baja</button>
+      <button class="floor-tab"        onclick="switchFloor('pa')">Segundo Piso</button>
+    </div>
+
+    <!-- PLANTA BAJA -->
+    <div class="floor-canvas active" id="canvas-pb">
+      <svg class="fp-svg" viewBox="0 0 820 560" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <rect x="0" y="0" width="820" height="560" rx="16" fill="#F5EFE6"/>
+
+        <!-- CALLE (top strip) -->
+        <rect x="0" y="0" width="820" height="68" rx="16" fill="#D9D3C7"/>
+        <rect x="0" y="52" width="820" height="16" fill="#D9D3C7"/>
+        <line x1="0" y1="68" x2="820" y2="68" stroke="#B8B0A0" stroke-width="1.5"/>
+        <text x="410" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#7A7060" font-weight="600" letter-spacing="3">CALLE SAN BERNARDO</text>
+        <!-- Road markings -->
+        <line x1="150" y1="50" x2="210" y2="50" stroke="#C4B88A" stroke-width="2" stroke-dasharray="20,15"/>
+        <line x1="350" y1="50" x2="410" y2="50" stroke="#C4B88A" stroke-width="2" stroke-dasharray="20,15"/>
+        <line x1="560" y1="50" x2="620" y2="50" stroke="#C4B88A" stroke-width="2" stroke-dasharray="20,15"/>
+
+        <!-- PATIO FRONTAL -->
+        <rect x="30" y="72" width="760" height="90" rx="6" fill="#C8E6C9" stroke="#81C784" stroke-width="1.5"/>
+        <text x="410" y="108" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#388E3C" font-weight="700" letter-spacing="2">PATIO FRONTAL</text>
+        <text x="410" y="124" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#4CAF50">Área verde · Acceso principal</text>
+        <!-- Gate -->
+        <rect x="370" y="155" width="80" height="10" rx="3" fill="#81C784"/>
+        <text x="410" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#2E7D32" font-weight="700">ENTRADA</text>
+
+        <!-- Main house border -->
+        <rect x="30" y="165" width="760" height="330" rx="8" fill="white" stroke="#D9CEBC" stroke-width="2"/>
+
+        <!-- ENTRADA / ESCALERAS (center) -->
+        <rect x="320" y="170" width="180" height="130" rx="6" fill="#EEE8F8" stroke="#9575CD" stroke-width="1.5"/>
+        <text x="410" y="222" text-anchor="middle" font-family="Inter,sans-serif" font-size="10.5" fill="#512DA8" font-weight="700">ENTRADA</text>
+        <text x="410" y="237" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7E57C2">Acceso + Escaleras</text>
+        <!-- Stairs symbol -->
+        <g transform="translate(376,248)">
+          <rect x="0"  y="0"  width="68" height="8"  rx="2" fill="#B39DDB" opacity="0.7"/>
+          <rect x="4"  y="8"  width="60" height="7"  rx="2" fill="#B39DDB" opacity="0.6"/>
+          <rect x="8"  y="15" width="52" height="6"  rx="2" fill="#B39DDB" opacity="0.5"/>
+          <rect x="12" y="21" width="44" height="5"  rx="2" fill="#B39DDB" opacity="0.4"/>
+        </g>
+
+        <!-- BAÑO bajo escaleras -->
+        <rect x="320" y="300" width="180" height="60" rx="6" fill="#E8EAF6" stroke="#7986CB" stroke-width="1.5"/>
+        <text x="410" y="328" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#3F51B5" font-weight="600">BAÑO</text>
+        <text x="410" y="343" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="#7986CB">Bajo escaleras</text>
+
+        <!-- SALA (right) -->
+        <rect x="510" y="170" width="270" height="190" rx="6" fill="#FFF8E1" stroke="#FFD54F" stroke-width="1.5"/>
+        <text x="645" y="255" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#F57F17" font-weight="700">SALA</text>
+        <text x="645" y="272" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#F9A825">Área común</text>
+        <!-- Sofa icon suggestion -->
+        <rect x="540" y="290" width="150" height="35" rx="6" fill="#FFE082" opacity="0.6"/>
+        <rect x="540" y="320" width="30" height="25" rx="4" fill="#FFD54F" opacity="0.7"/>
+        <rect x="680" y="320" width="30" height="25" rx="4" fill="#FFD54F" opacity="0.7"/>
+
+        <!-- COMEDOR (left) -->
+        <rect x="40" y="170" width="270" height="130" rx="6" fill="#E8F5E9" stroke="#66BB6A" stroke-width="1.5"/>
+        <text x="175" y="228" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#2E7D32" font-weight="700">COMEDOR</text>
+        <text x="175" y="244" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4CAF50">Área común</text>
+        <!-- Table suggestion -->
+        <rect x="120" y="255" width="110" height="22" rx="4" fill="#A5D6A7" opacity="0.6"/>
+        <rect x="113" y="253" width="10" height="26" rx="3" fill="#81C784" opacity="0.5"/>
+        <rect x="237" y="253" width="10" height="26" rx="3" fill="#81C784" opacity="0.5"/>
+
+        <!-- COCINA (bottom-left, connected to comedor) -->
+        <rect x="40" y="310" width="270" height="110" rx="6" fill="#FBE9E7" stroke="#FF8A65" stroke-width="1.5"/>
+        <text x="175" y="362" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#BF360C" font-weight="700">COCINA</text>
+        <text x="175" y="378" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#E64A19">Área común · Equipada</text>
+        <!-- Connection doorway between comedor y cocina -->
+        <rect x="125" y="297" width="100" height="14" rx="0" fill="white" stroke="none"/>
+        <text x="175" y="308" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#A5D6A7" font-weight="600">PASO</text>
+
+        <!-- PATIO TRASERO -->
+        <rect x="30" y="500" width="760" height="50" rx="6" fill="#C8E6C9" stroke="#81C784" stroke-width="1.5"/>
+        <text x="410" y="523" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#388E3C" font-weight="700">PATIO TRASERO</text>
+        <text x="410" y="538" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4CAF50">Lavadora · Lavadero · Cuarto de servicio</text>
+
+        <!-- Divider line planta baja / patio -->
+        <line x1="30" y1="497" x2="790" y2="497" stroke="#D9CEBC" stroke-width="1.5" stroke-dasharray="8,5"/>
+
+        <!-- Label Planta Baja -->
+        <text x="410" y="14" text-anchor="middle" font-family="'Playfair Display',serif" font-size="0" fill="#1B3A5C"/>
+
+        <!-- CLICK TARGETS planta baja -->
+        <rect x="0"   y="0"   width="820" height="68"  rx="16" fill="transparent" style="cursor:pointer" onclick="previewZone('calle', 'Calle / Fachada', ['img/calle-1.jpg','img/calle-2.jpg'])"/>
+        <rect x="30"  y="72"  width="760" height="90"  rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('patio-frontal', 'Patio Frontal', ['img/patio-frontal.jpg'])"/>
+        <rect x="510" y="170" width="270" height="190" rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('sala', 'Sala', ['img/sala.jpg'])"/>
+        <rect x="40"  y="170" width="270" height="130" rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('comedor', 'Comedor', ['img/comedor.jpg'])"/>
+        <rect x="40"  y="310" width="270" height="110" rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('cocina', 'Cocina', ['img/cocina-1.jpg', 'img/cocina-2.jpg'])"/>
+        <rect x="320" y="170" width="180" height="130" rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('entrada', 'Entrada / Escaleras', ['img/entrada-1.jpg', 'img/entrada-2.jpg'])"/>
+        <rect x="30"  y="500" width="760" height="50"  rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('patio-trasero', 'Patio Trasero', [])"/>
+      </svg>
+    </div>
+
+    <!-- SEGUNDO PISO -->
+    <div class="floor-canvas" id="canvas-pa">
+      <svg class="fp-svg" viewBox="0 0 820 480" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="820" height="480" rx="16" fill="#F5EFE6"/>
+
+        <!-- Floor outline -->
+        <rect x="30" y="30" width="760" height="420" rx="8" fill="white" stroke="#D9CEBC" stroke-width="2"/>
+
+        <!-- Title strip -->
+        <rect x="30" y="30" width="760" height="34" rx="8" fill="#EDE4D6"/>
+        <rect x="30" y="50" width="760" height="14" fill="#EDE4D6"/>
+        <text x="410" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#8A7A60" font-weight="700" letter-spacing="2">SEGUNDO PISO</text>
+
+        <!-- Stairwell (center bottom) -->
+        <rect x="340" y="370" width="140" height="70" rx="6" fill="#EEE8F8" stroke="#9575CD" stroke-width="1.5"/>
+        <text x="410" y="402" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#512DA8" font-weight="700">ESCALERAS</text>
+        <g transform="translate(358,408)">
+          <rect x="0"  y="0"  width="104" height="6"  rx="2" fill="#B39DDB" opacity="0.7"/>
+          <rect x="4"  y="6"  width="96"  height="5"  rx="2" fill="#B39DDB" opacity="0.55"/>
+          <rect x="8"  y="11" width="88"  height="5"  rx="2" fill="#B39DDB" opacity="0.4"/>
+          <rect x="12" y="16" width="80"  height="4"  rx="2" fill="#B39DDB" opacity="0.3"/>
+        </g>
+
+        <!-- BAÑO COMPARTIDO (top center, pegado al título SEGUNDO PISO) -->
+        <rect x="340" y="64" width="140" height="65" rx="6" fill="#E8EAF6" stroke="#7986CB" stroke-width="1.5"/>
+        <text x="410" y="91" text-anchor="middle" font-family="Inter,sans-serif" font-size="10.5" fill="#3F51B5" font-weight="700">BAÑO</text>
+        <text x="410" y="105" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="#7986CB">Compartido H2 y H3</text>
+        <!-- Bath icon -->
+        <rect x="352" y="114" width="38" height="9" rx="3" fill="#9FA8DA" opacity="0.5"/>
+        <circle cx="430" cy="118" r="7" fill="none" stroke="#9FA8DA" stroke-width="1.5" opacity="0.7"/>
+
+        <!-- HAB 1 — PRINCIPAL (right, large) -->
+        <rect x="500" y="64" width="280" height="390" rx="6" fill="#DCEAF7" stroke="#2A5080" stroke-width="2"/>
+        <text x="640" y="160" text-anchor="middle" font-family="'Playfair Display',serif" font-size="14" fill="#1B3A5C" font-weight="700">Habitación 1</text>
+        <text x="640" y="178" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1B3A5C" font-weight="700">$5,500 / mes</text>
+
+        <!-- Status -->
+        <rect x="598" y="188" width="84" height="18" rx="9" fill="#EAF6F0"/>
+        <text x="640" y="200" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="#2E9E62" font-weight="700" id="fp-s1">● DISPONIBLE</text>
+
+        <!-- BAÑO PRIVADO inside H1 -->
+        <rect x="512" y="70" width="130" height="115" rx="5" fill="#B8D4EE" stroke="#2A5080" stroke-width="1.2"/>
+        <text x="577" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="#1B3A5C" font-weight="700">Baño privado</text>
+        <text x="577" y="132" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2A5080">Walking closet · Tina</text>
+
+        <!-- Bed in H1 -->
+        <rect x="560" y="270" width="170" height="100" rx="5" fill="#9EC5E3" opacity="0.6"/>
+        <rect x="560" y="270" width="170" height="22" rx="5" fill="#7BACCF" opacity="0.7"/>
+        <text x="645" y="286" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#1B3A5C" opacity="0.7">CAMA</text>
+
+        <!-- H1 label: "PRINCIPAL" badge -->
+        <rect x="596" y="388" width="88" height="18" rx="9" fill="rgba(27,58,92,0.12)"/>
+        <text x="640" y="400" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#1B3A5C" font-weight="700" letter-spacing="1">PRINCIPAL</text>
+
+        <!-- HAB 2 (left-top) -->
+        <rect x="40" y="64" width="280" height="190" rx="6" fill="#FCF0EA" stroke="#D9624A" stroke-width="2"/>
+        <text x="180" y="150" text-anchor="middle" font-family="'Playfair Display',serif" font-size="13" fill="#1B3A5C" font-weight="700">Habitación 2</text>
+        <text x="180" y="167" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1B3A5C" font-weight="700">$4,500 / mes</text>
+        <rect x="138" y="174" width="84" height="18" rx="9" fill="#FCEEE9"/>
+        <text x="180" y="186" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="#D9624A" font-weight="700" id="fp-s2">● OCUPADA</text>
+        <!-- Desk -->
+        <rect x="50" y="70" width="70" height="40" rx="4" fill="#FBCDB7" opacity="0.7"/>
+        <text x="85" y="93" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#7A3020">Escritorio</text>
+        <!-- Closet -->
+        <rect x="130" y="70" width="55" height="50" rx="4" fill="#F4B8A0" opacity="0.6"/>
+        <text x="157" y="97" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#7A3020">Clóset</text>
+        <!-- Bed H2 -->
+        <rect x="50" y="185" width="130" height="55" rx="4" fill="#F7C5AD" opacity="0.6"/>
+        <text x="115" y="215" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#7A3020">CAMA</text>
+
+        <!-- HAB 3 (left-bottom) -->
+        <rect x="40" y="264" width="280" height="190" rx="6" fill="#F0FAFA" stroke="#2E9E62" stroke-width="2"/>
+        <text x="180" y="350" text-anchor="middle" font-family="'Playfair Display',serif" font-size="13" fill="#1B3A5C" font-weight="700">Habitación 3</text>
+        <text x="180" y="367" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#1B3A5C" font-weight="700">$4,500 / mes</text>
+        <rect x="138" y="374" width="84" height="18" rx="9" fill="#EAF6F0"/>
+        <text x="180" y="386" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="#2E9E62" font-weight="700" id="fp-s3">● DISPONIBLE</text>
+        <!-- Desk H3 -->
+        <rect x="50" y="270" width="70" height="40" rx="4" fill="#A8E6C8" opacity="0.7"/>
+        <text x="85" y="293" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#1a6640">Escritorio</text>
+        <!-- Closet H3 -->
+        <rect x="130" y="270" width="55" height="50" rx="4" fill="#8ED4B0" opacity="0.6"/>
+        <text x="157" y="297" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#1a6640">Clóset</text>
+        <!-- Bed H3 -->
+        <rect x="50" y="385" width="130" height="55" rx="4" fill="#A8E6C8" opacity="0.5"/>
+        <text x="115" y="415" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#1a6640">CAMA</text>
+
+        <!-- Arrows: hab2 y hab3 to baño compartido (arriba) -->
+        <line x1="320" y1="130" x2="340" y2="100" stroke="#7986CB" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
+        <line x1="320" y1="360" x2="370" y2="129" stroke="#7986CB" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
+
+        <!-- Click targets hab rooms -->
+        <rect x="500" y="64" width="280" height="390" rx="6" fill="transparent" style="cursor:pointer" onclick="openModal(1)"/>
+        <rect x="40"  y="64" width="280" height="190" rx="6" fill="transparent" style="cursor:pointer" onclick="openModal(2)"/>
+        <rect x="40"  y="264" width="280" height="190" rx="6" fill="transparent" style="cursor:pointer" onclick="openModal(3)"/>
+        <!-- Click target baño compartido -->
+        <rect x="340" y="64" width="140" height="65" rx="6" fill="transparent" style="cursor:pointer" onclick="previewZone('bano-compartido','Baño Compartido',['img/bano-compartido.jpg'])"/>
+
+        <!-- Compass -->
+        <g transform="translate(760,460)">
+          <circle cx="0" cy="0" r="18" fill="rgba(27,58,92,0.08)" stroke="#D9CEBC" stroke-width="1"/>
+          <text x="0" y="-6" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#1B3A5C" font-weight="700">N</text>
+          <line x1="0" y1="-14" x2="0" y2="-3" stroke="#1B3A5C" stroke-width="1.5"/>
+          <polygon points="0,-14 3,-8 0,-11 -3,-8" fill="#1B3A5C"/>
+        </g>
+      </svg>
+    </div>
+
+    <p class="fp-hint">
+      <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;color:var(--slate);"><path d="M15 10l-4 4l6 6l4-16L3 6l6 6l4-4"/></svg>
+      Toca cualquier zona del plano para ver sus fotos
+    </p>
+
+    <!-- Zone photo preview -->
+    <div id="zone-preview" style="display:none; margin-top:28px; background:var(--sand-mid); border-radius:var(--r-lg); overflow:hidden; border:1.5px solid var(--sand-dark); box-shadow:var(--shadow-md);">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:var(--navy); color:white;">
+        <span id="zone-preview-title" style="font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;"></span>
+        <button onclick="closeZonePreview()" style="background:rgba(255,255,255,0.15); border:none; color:white; border-radius:50%; width:28px; height:28px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;">×</button>
+      </div>
+      <div id="zone-preview-imgs" style="position:relative; height:320px; background:#18202B;">
+        <!-- fotos cargadas dinámicamente -->
+      </div>
+      <div id="zone-preview-dots" style="display:flex; justify-content:center; gap:8px; padding:12px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ROOM CARDS
+============================================================ -->
+<section class="section rooms-section" id="cuartos">
+  <div class="section-inner">
+    <div class="section-label">Disponibilidad</div>
+    <h2 class="section-title">Elige tu <span>habitación</span></h2>
+    <div class="rooms-grid" id="rooms-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     AMENIDADES
+============================================================ -->
+<section class="section amenities-section" id="amenidades">
+  <div class="section-inner">
+    <div class="section-label" style="color:rgba(255,255,255,0.45);">Incluido en tu renta</div>
+    <h2 class="section-title">Todo lo que necesitas,<br><span>sin cobros extra</span></h2>
+    <div class="amenities-grid">
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="amenity-name">Luz incluida</div>
+        <div class="amenity-sub">Sin límite de consumo</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+        </div>
+        <div class="amenity-name">Agua incluida</div>
+        <div class="amenity-sub">Sin cargo adicional</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17 12h.01"/><path d="M3 8a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7a4 4 0 01-4-4z"/><path d="M7 16v2M17 16v2M7 8v.01M12 8v.01M17 8v.01M12 12v.01"/></svg>
+        </div>
+        <div class="amenity-name">Gas incluido</div>
+        <div class="amenity-sub">Regadera caliente siempre</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+        </div>
+        <div class="amenity-name">Internet WiFi</div>
+        <div class="amenity-sub">Alta velocidad incluida</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <div class="amenity-name">Casa amueblada</div>
+        <div class="amenity-sub">Todas las áreas comunes</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="amenity-name">Sala y comedor</div>
+        <div class="amenity-sub">Áreas comunes compartidas</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </div>
+        <div class="amenity-name">Cocina equipada</div>
+        <div class="amenity-sub">Refrigerador y estufa</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </div>
+        <div class="amenity-name">Dos patios</div>
+        <div class="amenity-sub">Frontal y trasero</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="amenity-name">Lavadora</div>
+        <div class="amenity-sub">Patio trasero · Lavadero</div>
+      </div>
+
+      <div class="amenity-card">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="amenity-name">Solo 3 compañeros</div>
+        <div class="amenity-sub">Casa tranquila</div>
+      </div>
+
+      <div class="amenity-card" style="grid-column: span 2;">
+        <div class="amenity-icon-wrap">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="amenity-name">Limpieza de áreas comunes</div>
+        <div class="amenity-sub">Cooperación de $125 por servicio · Cada inquilino contribuye equitativamente</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MAPA
+============================================================ -->
+<section class="section map-section" id="ubicacion">
+  <div class="section-inner">
+    <div class="section-label">Ubicación</div>
+    <h2 class="section-title">En el corazón de <span>Juriquilla</span></h2>
+    <div class="map-layout">
+      <div class="map-embed">
+        <iframe
+          src="https://maps.google.com/maps?q=20.703058,-100.449333&z=16&output=embed"
+          allowfullscreen loading="lazy"
+          title="Ubicación Casa Juriquilla">
+        </iframe>
+      </div>
+      <div class="map-sidebar">
+
+        <div class="nearby-card">
+          <div class="nearby-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div>
+            <div class="nearby-name">UAQ Campus Juriquilla</div>
+            <div class="nearby-dist">~5 min caminando</div>
+          </div>
+        </div>
+
+        <div class="nearby-card">
+          <div class="nearby-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div>
+            <div class="nearby-name">UVM Querétaro</div>
+            <div class="nearby-dist">~5 min caminando</div>
+          </div>
+        </div>
+
+        <div class="nearby-card">
+          <div class="nearby-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </div>
+          <div>
+            <div class="nearby-name">Supermercados y comercios</div>
+            <div class="nearby-dist">Zona bien abastecida</div>
+          </div>
+        </div>
+
+        <div class="nearby-card">
+          <div class="nearby-icon">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div>
+            <div class="nearby-name">Transporte público</div>
+            <div class="nearby-dist">Acceso fácil a toda la ciudad</div>
+          </div>
+        </div>
+
+        <div class="nearby-card">
+          <div class="nearby-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <div>
+            <div class="nearby-name">Restaurantes y cafés</div>
+            <div class="nearby-dist">Zona Juriquilla</div>
+          </div>
+        </div>
+
+        <div class="map-address-tag">
+          <div class="mat-label">Dirección exacta</div>
+          <div class="mat-addr">Calle San Bernardo 208<br>Juriquilla San Francisco<br>Querétaro, C.P. 76230</div>
+          <a class="mat-link" href="https://maps.app.goo.gl/1aYNth3ruWvrzTCL8" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Abrir en Google Maps
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="footer-brand">Casa<span>Juriquilla</span></div>
+  <div class="footer-meta">
+    Calle San Bernardo 208 · Juriquilla San Francisco, Querétaro<br>
+    Para más información: <strong style="color:rgba(255,255,255,0.7);">446 214 0005</strong>
+  </div>
+  <a class="footer-wa" href="https://wa.me/524462140005" target="_blank" rel="noopener">
+    <svg class="icon" viewBox="0 0 24 24" style="fill:white;stroke:none;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.857L.073 23.927l6.233-1.638A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.661-.523-5.176-1.431l-.371-.22-3.698.97.987-3.604-.241-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Contactar por WhatsApp
+  </a>
+</footer>
+
+<!-- ============================================================
+     MODAL
+============================================================ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
+      <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-photos" id="modal-photos"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
+<script src="config.js"></script>
+<script>
+// ================================================================
+//  UTILS
+// ================================================================
+function scrollTo(sel) {
+  document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function fmt(n) {
+  return '$' + n.toLocaleString('es-MX');
+}
+
+function statusLabel(s) {
+  if (s === 'disponible')   return { cls: 'available', text: 'Disponible' };
+  if (s === 'ocupada')      return { cls: 'occupied',  text: 'Ocupada' };
+  if (s === 'próximamente') return { cls: 'soon',      text: 'Disponible pronto' };
+  return { cls: 'available', text: s };
+}
+
+// ================================================================
+//  FLOOR PLAN TABS
+// ================================================================
+function switchFloor(id) {
+  document.querySelectorAll('.floor-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.floor-canvas').forEach(c => c.classList.remove('active'));
+  document.getElementById('canvas-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// Sync floor plan status badges from config
+function syncFpStatus() {
+  [1, 2, 3].forEach(n => {
+    const el = document.getElementById('fp-s' + n);
+    if (!el) return;
+    const r = CONFIG.rooms[n];
+    const s = statusLabel(r.status);
+    const colors = { available: '#2E9E62', occupied: '#D9624A', soon: '#C4963A' };
+    el.textContent = '● ' + s.text.toUpperCase();
+    el.setAttribute('fill', colors[s.cls] || '#2E9E62');
+    const rect = el.previousElementSibling;
+    if (rect && rect.tagName === 'rect') {
+      const bgs = { available: '#EAF6F0', occupied: '#FCEEE9', soon: '#FBF3E3' };
+      rect.setAttribute('fill', bgs[s.cls] || '#EAF6F0');
+    }
+  });
+}
+
+// ================================================================
+//  ROOM CARDS — Build from config
+// ================================================================
+function buildCards() {
+  const grid = document.getElementById('rooms-grid');
+  grid.innerHTML = '';
+  Object.entries(CONFIG.rooms).forEach(([id, r]) => {
+    const s = statusLabel(r.status);
+    const isAvail = r.status === 'disponible';
+    const imgs = r.imagenes || [];
+
+    // Gallery HTML
+    const dotsHtml = imgs.length > 1
+      ? `<div class="gallery-dots">${imgs.map((_, i) => `<div class="gdot${i===0?' active':''}" onclick="event.stopPropagation();cycleImg(${id},${i})"></div>`).join('')}</div>`
+      : '';
+
+    const imgHtml = imgs.length
+      ? `<img src="${imgs[0]}" alt="${r.nombre}" id="card-img-${id}"
+             onerror="this.style.background='var(--sand-mid)';this.style.padding='60px';this.src=''">`
+      : `<div style="height:210px;display:flex;align-items:center;justify-content:center;background:var(--sand-mid);flex-direction:column;gap:8px;">
+          <svg style="width:40px;height:40px;stroke:var(--slate);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span style="font-size:0.75rem;color:var(--slate);">img pendiente</span>
+         </div>`;
+
+    const featHtml = r.caracteristicas.map(f =>
+      `<li>
+        <span class="feat-icon">
+          <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        ${f}
+      </li>`
+    ).join('');
+
+    const btnHtml = isAvail
+      ? `<button class="card-btn primary" onclick="event.stopPropagation();openModal(${id})">
+          <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Ver detalles y agendar visita
+         </button>`
+      : `<button class="card-btn waitlist" onclick="event.stopPropagation();openModal(${id})">
+          <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Avisarme cuando esté disponible
+         </button>`;
+
+    grid.innerHTML += `
+      <div class="room-card" onclick="openModal(${id})">
+        <div class="room-gallery" id="gallery-${id}">
+          ${imgHtml}
+          ${dotsHtml}
+        </div>
+        <div class="room-body">
+          <div class="room-header">
+            <div class="room-name">${r.nombre}</div>
+            <div class="room-price"><strong>${fmt(r.precio)}</strong><small>/ mes</small></div>
+          </div>
+          <div class="status-badge ${s.cls}"><div class="status-dot"></div>${s.text}</div>
+          <ul class="room-features">${featHtml}</ul>
+          ${btnHtml}
+        </div>
+      </div>`;
+  });
+}
+
+// Image cycling in card gallery
+const cardImgIndex = {};
+function cycleImg(id, idx) {
+  const r = CONFIG.rooms[id];
+  if (!r.imagenes?.length) return;
+  cardImgIndex[id] = idx;
+  const img = document.getElementById('card-img-' + id);
+  if (img) img.src = r.imagenes[idx];
+  const dots = document.querySelectorAll(`#gallery-${id} .gdot`);
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+// ================================================================
+//  MODAL
+// ================================================================
+let activeRoom = null;
+let modalImgIdx = 0;
+
+function openModal(id) {
+  activeRoom = id;
+  modalImgIdx = 0;
+  const r = CONFIG.rooms[id];
+  const s = statusLabel(r.status);
+  const isAvail = r.status === 'disponible';
+  const imgs = r.imagenes || [];
+
+  // Photos strip
+  const photosEl = document.getElementById('modal-photos');
+  if (imgs.length) {
+    photosEl.style.display = 'block';
+    photosEl.innerHTML = imgs.map((src, i) =>
+      `<img src="${src}" class="${i===0?'active':''}" alt="${r.nombre} foto ${i+1}"
+            onerror="this.style.display='none'">`
+    ).join('');
+    if (imgs.length > 1) {
+      photosEl.innerHTML += `<div class="modal-photo-nav">
+        ${imgs.map((_, i) => `<button class="mpn-dot${i===0?' active':''}" onclick="switchModalPhoto(${i})"></button>`).join('')}
+      </div>`;
+    }
+  } else {
+    photosEl.style.display = 'none';
+  }
+
+  // Features
+  const featHtml = r.caracteristicas.map(f =>
+    `<li>
+      <span style="color:var(--green);">
+        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      ${f}
+    </li>`
+  ).join('');
+
+  // Rules
+  const rulesHtml = CONFIG.reglas.map(rule => `<li>${rule}</li>`).join('');
+
+  // Horarios
+  const slotsHtml = CONFIG.horarios.map((h, i) =>
+    `<div class="time-chip" data-idx="${i}" onclick="toggleSlot(this)">${h.label}<br><strong>${h.hora}</strong></div>`
+  ).join('');
+
+  const availableForm = `
+    <div class="rules-block">
+      <h4>
+        <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Condiciones del arrendamiento
+      </h4>
+      <ul class="rules-list">${rulesHtml}</ul>
+    </div>
+    <p style="font-size:0.78rem;color:var(--slate);margin-bottom:18px;line-height:1.5;">
+      Al enviar tus datos confirmas que leíste y aceptas las condiciones anteriores.
+    </p>
+    <div id="modal-form">
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" id="inp-name" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label>Tu WhatsApp</label>
+        <input type="tel" id="inp-tel" placeholder="442 123 4567">
+      </div>
+      <div class="form-group">
+        <label>¿Cuándo quisieras entrar?</label>
+        <input type="date" id="inp-date" min="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <label>Elige hasta 3 horarios para tu visita</label>
+        <div class="time-grid">${slotsHtml}</div>
+      </div>
+      <button class="modal-submit wa" onclick="sendWA()">
+        <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;stroke:none;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.857L.073 23.927l6.233-1.638A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.661-.523-5.176-1.431l-.371-.22-3.698.97.987-3.604-.241-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Enviar por WhatsApp y agendar visita
+      </button>
+    </div>
+    <div class="success-card" id="success-card">
+      <h3>¡Listo!</h3>
+      <p>Se abrirá WhatsApp con un mensaje listo para enviar.<br>La arrendadora te confirmará tu visita directamente.</p>
+    </div>`;
+
+  const waitlistForm = `
+    <div class="rules-block">
+      <h4>
+        <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Lista de espera
+      </h4>
+      <ul class="rules-list"><li>Este cuarto está actualmente ocupado. Déjanos tus datos y te avisaremos en cuanto esté disponible.</li></ul>
+    </div>
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="inp-name" placeholder="Tu nombre">
+    </div>
+    <div class="form-group">
+      <label>Tu WhatsApp</label>
+      <input type="tel" id="inp-tel" placeholder="442 123 4567">
+    </div>
+    <div class="form-group">
+      <label>¿Para cuándo necesitas el cuarto?</label>
+      <input type="date" id="inp-date" min="${new Date().toISOString().split('T')[0]}">
+    </div>
+    <button class="modal-submit wa" onclick="sendWaitlistWA()">
+      <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;stroke:none;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.857L.073 23.927l6.233-1.638A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.893 0-3.661-.523-5.176-1.431l-.371-.22-3.698.97.987-3.604-.241-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Anotarme en lista de espera (WhatsApp)
+    </button>`;
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-header">
+      <div class="status-badge ${s.cls}" style="margin-bottom:10px;"><div class="status-dot"></div>${s.text}</div>
+      <div class="modal-room-name">${r.nombre}</div>
+      <div class="modal-price-row">
+        <span class="modal-price-num">${fmt(r.precio)}</span>
+        <span class="modal-price-per">/ mes</span>
+      </div>
+    </div>
+    <ul class="modal-features">${featHtml}</ul>
+    ${isAvail ? availableForm : waitlistForm}`;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function switchModalPhoto(idx) {
+  const photos = document.querySelectorAll('#modal-photos img');
+  const dots = document.querySelectorAll('.mpn-dot');
+  photos.forEach((img, i) => img.classList.toggle('active', i === idx));
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  modalImgIdx = idx;
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  activeRoom = null;
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ================================================================
+//  TIME CHIPS
+// ================================================================
+function toggleSlot(el) {
+  const selected = document.querySelectorAll('.time-chip.sel');
+  if (el.classList.contains('sel')) {
+    el.classList.remove('sel');
+  } else if (selected.length < 3) {
+    el.classList.add('sel');
+  } else {
+    selected[0].classList.remove('sel');
+    el.classList.add('sel');
+  }
+}
+
+// ================================================================
+//  WHATSAPP SEND
+// ================================================================
+function sendWA() {
+  const name = document.getElementById('inp-name')?.value?.trim();
+  const tel  = document.getElementById('inp-tel')?.value?.trim();
+  const date = document.getElementById('inp-date')?.value;
+  if (!name) { alert('Por favor ingresa tu nombre.'); return; }
+  if (!tel)  { alert('Por favor ingresa tu WhatsApp.'); return; }
+
+  const r = CONFIG.rooms[activeRoom];
+  const slots = Array.from(document.querySelectorAll('.time-chip.sel'))
+    .map(c => c.innerText.replace('\n', ' '));
+  const slotsText = slots.length ? slots.join(' | ') : 'A convenir';
+  const dateText = date
+    ? new Date(date + 'T12:00').toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+    : 'a convenir';
+
+  const msg =
+`¡Hola! Me interesa la *${r.nombre}* en ${fmt(r.precio)}/mes — Casa Juriquilla.
+
+*Mis datos:*
+• Nombre: ${name}
+• WhatsApp: ${tel}
+• Fecha deseada de entrada: ${dateText}
+• Horarios disponibles para visita: ${slotsText}
+
+He leído y acepto las condiciones del arrendamiento (depósito 1 mes, contrato mínimo 6 meses, sin invitados sin autorización). ¿Podemos coordinar una visita?`;
+
+  document.getElementById('success-card')?.classList.add('show');
+  const form = document.getElementById('modal-form');
+  if (form) { form.style.opacity = '0.4'; form.style.pointerEvents = 'none'; }
+  setTimeout(() => window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank'), 700);
+}
+
+function sendWaitlistWA() {
+  const name = document.getElementById('inp-name')?.value?.trim();
+  const tel  = document.getElementById('inp-tel')?.value?.trim();
+  const date = document.getElementById('inp-date')?.value;
+  if (!name) { alert('Por favor ingresa tu nombre.'); return; }
+  if (!tel)  { alert('Por favor ingresa tu WhatsApp.'); return; }
+
+  const r = CONFIG.rooms[activeRoom];
+  const dateText = date
+    ? new Date(date + 'T12:00').toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+    : 'lo antes posible';
+
+  const msg =
+`¡Hola! Me interesa quedar en *lista de espera* para la *${r.nombre}* (${fmt(r.precio)}/mes) — Casa Juriquilla.
+
+*Mis datos:*
+• Nombre: ${name}
+• WhatsApp: ${tel}
+• Fecha en que necesito el cuarto: ${dateText}
+
+Por favor avísenme cuando esté disponible. ¡Gracias!`;
+
+  window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ================================================================
+//  ZONE PHOTO PREVIEW (plano interactivo)
+// ================================================================
+let zoneImgIdx = 0;
+let zoneImgs = [];
+
+function previewZone(id, title, imgs) {
+  const panel = document.getElementById('zone-preview');
+  const titleEl = document.getElementById('zone-preview-title');
+  const imgContainer = document.getElementById('zone-preview-imgs');
+  const dotsEl = document.getElementById('zone-preview-dots');
+
+  titleEl.textContent = title;
+  zoneImgs = imgs;
+  zoneImgIdx = 0;
+
+  if (!imgs || imgs.length === 0) {
+    imgContainer.innerHTML = `<div style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;">
+      <svg style="width:48px;height:48px;stroke:rgba(255,255,255,0.2);fill:none;stroke-width:1.5;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Foto próximamente</span>
+    </div>`;
+    dotsEl.innerHTML = '';
+  } else {
+    imgContainer.innerHTML = imgs.map((src, i) =>
+      `<img src="${src}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${i===0?1:0};transition:opacity 0.3s ease;" onerror="this.style.display='none'">`
+    ).join('');
+    dotsEl.innerHTML = imgs.length > 1
+      ? imgs.map((_, i) => `<button onclick="switchZonePhoto(${i})" style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;background:${i===0?'var(--navy)':'var(--sand-dark)'};transition:background 0.2s;"></button>`).join('')
+      : '';
+  }
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function switchZonePhoto(idx) {
+  const imgs = document.querySelectorAll('#zone-preview-imgs img');
+  const dots = document.querySelectorAll('#zone-preview-dots button');
+  imgs.forEach((img, i) => { img.style.opacity = i === idx ? '1' : '0'; });
+  dots.forEach((d, i) => { d.style.background = i === idx ? 'var(--navy)' : 'var(--sand-dark)'; });
+  zoneImgIdx = idx;
+}
+
+function closeZonePreview() {
+  document.getElementById('zone-preview').style.display = 'none';
+}
+
+// ================================================================
+//  INIT
+// ================================================================
+syncFpStatus();
+buildCards();
+</script>
+</body>
+</html>
